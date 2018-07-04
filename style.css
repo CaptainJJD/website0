@@ -1,0 +1,19 @@
+body{
+      font-family: consolas;
+      } 
+      h1{
+        text-align: center;
+        color: purple;
+        margine: 30px 50px;
+        }
+        
+        .gallery{
+        marigin: 10px 50px;
+        }
+        .gallery img{
+        width: 230px;
+        padding: 5px
+        }
+        .gallery img:hover{
+        }
+        
