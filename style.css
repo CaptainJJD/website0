@@ -1,12 +1,10 @@
 body{
       font-family: 'Alegreya SC';font-size 40px;
-      } 
-
-      h1{
-        text-align: center;
-        color: Indigo;
-        margine: 30px 50px;
-        }
+} 
+h1{
+    text-align: center;
+    color: Indigo;
+}
         
 p{
       color: Black;
