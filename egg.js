@@ -41,7 +41,7 @@ Egg.prototype.__execute = function(fn) {
 // converts literal character values to keyCodes
 Egg.prototype.__toCharCodes = function(keys) {
   var special = {
-      "slash": 191, "e": 69, "g": 71, "g": 71, "right": 39
+      "slash": 191, "up": 38, "down": 40, "left": 37, "right": 39, "enter": 13, "space": 32, "ctrl": 17, "alt": 18, "tab": 9, "esc": 27
     },
     specialKeys = Object.keys(special);
 
@@ -84,7 +84,7 @@ Egg.prototype.AddHook = function(fn) {
 
 Egg.prototype.handleEvent = function(e) {
   var keyCode  = e.which;
-  var isLetter = keyCode >= 69 && keyCode <= 71;
+  var isLetter = keyCode >= 65 && keyCode <= 90;
   /*
     This prevents find as you type in Firefox.
     Only prevent default behavior for letters A-Z.
@@ -146,13 +146,13 @@ Egg.prototype.listen  = Egg.prototype.Listen;
 Egg.prototype.addCode = Egg.prototype.AddCode;
 Egg.prototype.addHook = Egg.prototype.AddHook;
 
-// EGGSAMPLE
-// var egg = new Egg();
-// egg
-//   .AddCode("e,g,g", function() {
-//     alert("Egg!");
-//   }, "konami-code")
-//  .AddHook(function(){
-//     console.log("Hook called for: " + this.activeEgg.keys);
-//     console.log(this.activeEgg.metadata);
-//   }).Listen();
+ EGGSAMPLE
+var egg = new Egg();
+egg
+  .AddCode("e,g,g", function() {
+    alert("Egg");
+ }, "konami-code")
+ .AddHook(function(){
+   console.log("Hook called for: " + this.activeEgg.keys);
+   console.log(this.activeEgg.metadata);
+}).Listen();
