@@ -13,13 +13,7 @@
              
     <script type="text/javascript"> var egg = new Egg();
     egg.addCode("e,g,g", function() {
-      jQuery('#egggif').fadeIn(500, function() {
-        window.setTimeout(function() { jQuery('#egggif').hide(); }, 5000);
-      });
-    }, "konami-code");
-    egg.addHook(function(){
-      console.log("Hook called for: " + this.activeEgg.keys);
-      console.log(this.activeEgg.metadata);
+     alert("Hello! I am an alert box!");
     });
     egg.listen();
              </script>
