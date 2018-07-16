@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html>
 <div style="display:none;"> heh heh don't look in here =^) </div>
+      <script type="text/javascript" src="https://cdn.rawgit.com/mikeflynn/egg.js/master/egg.min.js"></script>
+      var egg = new Egg();
+egg
+  .addCode("up,up,down", function() {
+    jQuery('#egggif').fadeIn(500, function() {
+      window.setTimeout(function() { jQuery('#egggif').hide(); }, 5000);
+    });
+  })
+  .addHook(function(){
+    console.log("Hook called for: " + this.activeEgg.keys);
+    console.log(this.activeEgg.metadata);
+  }).listen();
+      
+      
       <head>                                         
           <title></title>
           <link rel="stylesheet" type="text/css" href="lightbox.min.css">
