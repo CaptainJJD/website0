@@ -151,8 +151,4 @@ var egg = new Egg();
 egg
   .AddCode("e,g,g", function() {
     alert("Egg");
- }, "konami-code")
- .AddHook(function(){
-   console.log("Hook called for: " + this.activeEgg.keys);
-   console.log(this.activeEgg.metadata);
-}).Listen();
+ }:
