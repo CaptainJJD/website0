@@ -84,7 +84,7 @@ Egg.prototype.AddHook = function(fn) {
 
 Egg.prototype.handleEvent = function(e) {
   var keyCode  = e.which;
-  var isLetter = keyCode >= 65 && keyCode <= 90;
+  var isLetter = keyCode >= 69 && keyCode <= 71;
   /*
     This prevents find as you type in Firefox.
     Only prevent default behavior for letters A-Z.
