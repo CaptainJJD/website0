@@ -1,14 +1,16 @@
 <div>
-  <h1>/g/'s stupid cipher</h1>
+ <center> <h1></h1>
   <input id="textIn"> 
   <button id"btnConvert" onClick="convertText()">Convert</button>
   <br><br>
   <textarea id="textOut"></textarea>
 </div>
+  </center>
 
 <script type="application/javascript">
-  var alphabet = "!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ "
-  var encryptedAlphabet = "PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNO"
+var alphabet = "!&quot;#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+var encryptedAlphabet = "PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!&quot;#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNO"
+
 
   function convertText() {
     var t = document.getElementById("textIn").value
