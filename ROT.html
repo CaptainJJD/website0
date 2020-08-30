@@ -1,0 +1,27 @@
+<div>
+  <h1>/g/'s stupid cipher</h1>
+  <input id="textIn"> 
+  <button id"btnConvert" onClick="convertText()">Convert</button>
+  <br><br>
+  <textarea id="textOut"></textarea>
+</div>
+
+<script type="application/javascript">
+  var alphabet = "!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ "
+  var encryptedAlphabet = "PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNO"
+
+  function convertText() {
+    var t = document.getElementById("textIn").value
+    var ciphered = ""
+
+    for (var i = 0; i < t.length; i++) {
+      currentChar = t.charAt(i)
+      for(var j = 0; j < alphabet.length; j++) {
+        if(currentChar == alphabet.charAt(j)){
+           ciphered += encryptedAlphabet.charAt(j)
+        }
+      }
+    }
+    document.getElementById("textOut").innerHTML = ciphered
+  }
+</script>
