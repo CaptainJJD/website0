@@ -1,0 +1,36 @@
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<div>
+ <center> <h1></h1>
+  <input id="textIn"> 
+  <button id"btnConvert" onClick="convertText()">Convert</button>
+  <br><br>
+  <textarea id="textOut"></textarea>
+  </center>
+</div>
+  
+
+<script type="application/javascript">
+var alphabet = String.fromCharCode(77, 109, 105,99, 107, 101, 121)
+var encryptedAlphabet = String.fromCharCode(71, 103, 111, 111, 115, 101)
+
+
+  function convertText() {
+    var t = document.getElementById("textIn").value
+    var ciphered = ""
+
+    for (var i = 0; i < t.length; i++) {
+      currentChar = t.charAt(i)
+      for(var j = 0; j < alphabet.length; j++) {
+        if(currentChar == alphabet.charAt(j)){
+           ciphered += encryptedAlphabet.charAt(j)
+        }
+      }
+    }
+    document.getElementById("textOut").innerHTML = ciphered
+  }
+</script>
