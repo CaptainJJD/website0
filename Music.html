@@ -42,12 +42,54 @@ body {
 <div class="scrollable-content">
     <p></p>
 
-
+<!---------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------->
 </body>
 </html>
 <center>
 <a href="https://www.Dzikiewi.cz"><img src="b2h.gif" loading="lazy" width="250"></a>
 </center>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Scroll and Reveal</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            height: 100vh;
+        }
+        #hiddenSection {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #transparent;
+            border: 1px solid #ccc;
+        }
+        .scroll-button {
+            padding: 10px 20px;
+            font-size: 13px;
+            cursor: pointer;
+            background-color: #333333;
+            color: white;
+            border: none;
+            border-radius: 0;
+            font-family: "Times New Roman", Times, serif;
+            position: absolute;
+            right: 25px;
+            top: 20px;
+        }
+    </style>
+	
+
+    <!-- Place this button where you need it -->
+    <button class="scroll-button" onclick="revealAndScroll()">trash bin</button>
+    
+
+
+
 
 <br></br>
 <br></br> <!------------------------------> <!------------------------------> <!-----------BEGIN------------> <!------------------------------> <!------------------------------>
@@ -59,26 +101,9 @@ body {
 <br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
 <!------------------------------>
 
-&nbsp; &nbsp; <span style="font-family: 'Helvetica'; font-size: 38px; color: DarkSlateBlue; background-color: DarkTurquoise;">Harmonious Integers</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: cyan; font-style: italic; background-color: gray">trance/hard trance</span>
+&nbsp; &nbsp; <span style="font-family: 'Courier New'; font-size: 38px; color: purple; background-color: pink;">Psywave</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: cyan; font-style: italic; background-color: gray">trance/electronic</span>
 <p></p>
 
-&nbsp; <audio controls>
-  <source src="https://storage.googleapis.com/xovox/HarmoniousIntegers.wav" type="audio/wav">
-</audio>
-<p></p>
-<br></br>
-&nbsp; &nbsp; <button style="padding: 15px 30px; font-size: 18px;" onclick="toggleVideo('HI')">Open Video viewer</button>
-&nbsp; &nbsp; <div id="HI" class="videoContainer">
-  <iframe width="576" height="324" autoplay=false src="https://storage.googleapis.com/xovox/HarmoniousIntegers.mp4" frameborder="0" allowfullscreen></iframe> 
-</div>
-<p></p>
-
-<!------------------------------>
-<br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
-<!------------------------------>
-
-&nbsp; &nbsp; <span style="font-family: 'courier new'; font-size: 38px; color: gray; background-color: pink;">Psywave</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: cyan; font-style: italic; background-color: gray">trance/electronic</span>
-<p></p>
 &nbsp; <audio controls>
   <source src="https://storage.googleapis.com/xovox/Psywave.wav" type="audio/wav">
 </audio>
@@ -97,8 +122,6 @@ body {
 <!------------------------------>
 <br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
 <!------------------------------>
-
-
 
 &nbsp; &nbsp; <span style="font-family: 'Consolas'; font-size: 38px; color: green; background-color: gray;">Massive </span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: cyan; font-style: italic; background-color: gray">dubstep/brostep</span>
 <p></p>
@@ -224,9 +247,46 @@ body {
 <br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
 <!------------------------------>
 
+      <!-- Place this hidden section where you need it -->
+    <div id="hiddenSection">
+	<p style="color: white; background-color:gray">Ideas that didn't quite make it.........</span></p>
+ 
+
+     
+	
+	<!------------------------------>
+<!------------------------------>
+<br></br>
+&nbsp; &nbsp; <span style="font-family: 'Time New Roman'; font-size: 20px; color: black; background-color: lightgray">Electric Sunset Chase</span> 
+<p></p>
+&nbsp; <audio controls>
+  <source src="https://storage.googleapis.com/xovox/ElectricSunsetChaser.wav" type="audio/wav">
+</audio>
+
+  <!------------------------------>
+<!------------------------------>
+<br></br>
+&nbsp; &nbsp; <span style="font-family: 'Time New Roman'; font-size: 20px; color: black; background-color: lightgray">Temple</span> 
+<p></p>
+&nbsp; <audio controls>
+  <source src="https://storage.googleapis.com/xovox/Temple.wav" type="audio/wav">
+</audio>	
+    </script>
+	  <!------------------------------>
+<!------------------------------>
+<br></br>
+&nbsp; &nbsp; <span style="font-family: 'Time New Roman'; font-size: 20px; color: black; background-color: lightgray">Artifical Soundwaves</span> 
+<p></p>
+&nbsp; <audio controls>
+  <source src="https://storage.googleapis.com/xovox/ArtificialSoundwaves.wav" type="audio/wav">
+  
+</audio>	
+    </script>
 
 <!------------------------------>
 <br></br>
+
+    </div>
 <!------------------------------>
 <br></br>
 <br></br>
@@ -250,7 +310,13 @@ function toggleVideo(videoId) {
   videoContainer.style.display = (videoContainer.style.display === "block") ? "none" : "block";
 }
 </script>
-
+<script>
+        function revealAndScroll() {
+            let section = document.getElementById("hiddenSection");
+            section.style.display = "block";
+            section.scrollIntoView({ behavior: "smooth" });
+        }
+    </script>
 
     </div> <!----scrollable div>
 </body>
