@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Lorenz Attractor</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #info {
+      position: absolute;
+      top: 10px; left: 10px;
+      color: #fff; font-family: sans-serif;
+      background: rgba(0,0,0,0.3); padding: 5px 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="info"></div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dat.gui"></script>
+  <script>
+// --- parameters & initial state ---
+const params = {
+  sigma: 12.0,    // was 10.0
+  rho:   32.0,    // was 25.0
+  beta:  3.8,     // was 8/3 (~2.67)
+  x0:    1.0,     // same
+  y0:   -3.8,     // was 1.0
+  z0:    1.0,     // same
+  dt:    0.01,    // unchanged
+  steps: 20000,   // was 5000
+  reset() { initTrajectory(); }
+};
+
+    let scene, camera, renderer, controls;
+    let line, material;
+    let trajectory = [], drawCount = 0;
+
+    init();
+    animate();
+
+    function init() {
+      // scene + camera + renderer
+      scene    = new THREE.Scene();
+      camera   = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+      camera.position.set(30, 20, 30);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(innerWidth, innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // orbit controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      // shared line material
+      material = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+
+      // GUI
+      const gui = new dat.GUI();
+      gui.add(params, 'sigma',  0, 50).onChange(params.reset);
+      gui.add(params, 'rho',    0, 50).onChange(params.reset);
+      gui.add(params, 'beta',   0, 10).onChange(params.reset);
+      gui.add(params, 'x0',    -10, 10).step(0.1).name('x start').onChange(params.reset);
+      gui.add(params, 'y0',    -10, 10).step(0.1).name('y start').onChange(params.reset);
+      gui.add(params, 'z0',    -10, 10).step(0.1).name('z start').onChange(params.reset);
+      gui.add(params, 'steps', 1000, 20000).step(1000).name('Iterations').onChange(params.reset);
+
+      window.addEventListener('resize', onResize);
+      initTrajectory();
+    }
+
+    function onResize() {
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    }
+
+    // compute one RK4 step of Lorenz
+    function lorenz({x,y,z}) {
+      return {
+        dx: params.sigma * (y - x),
+        dy: x * (params.rho - z) - y,
+        dz: x * y - params.beta * z
+      };
+    }
+
+    function initTrajectory() {
+      // update info panel
+      document.getElementById('info').textContent =
+        `σ ${params.sigma.toFixed(1)} ρ ${params.rho.toFixed(1)} β ${params.beta.toFixed(2)} |  start=( ${params.x0.toFixed(1)},${params.y0.toFixed(1)},${params.z0.toFixed(1)} ) |  Iters=${params.steps}`;
+
+      // compute trajectory array
+      trajectory = [];
+      let s = { x:params.x0, y:params.y0, z:params.z0 };
+      for (let i = 0; i < params.steps; i++) {
+        const k1 = lorenz(s);
+        const s2 = { x:s.x+0.5*params.dt*k1.dx, y:s.y+0.5*params.dt*k1.dy, z:s.z+0.5*params.dt*k1.dz };
+        const k2 = lorenz(s2);
+        const s3 = { x:s.x+0.5*params.dt*k2.dx, y:s.y+0.5*params.dt*k2.dy, z:s.z+0.5*params.dt*k2.dz };
+        const k3 = lorenz(s3);
+        const s4 = { x:s.x+params.dt*k3.dx, y:s.y+params.dt*k3.dy, z:s.z+params.dt*k3.dz };
+        const k4 = lorenz(s4);
+
+        s.x += (params.dt/6)*(k1.dx + 2*k2.dx + 2*k3.dx + k4.dx);
+        s.y += (params.dt/6)*(k1.dy + 2*k2.dy + 2*k3.dy + k4.dy);
+        s.z += (params.dt/6)*(k1.dz + 2*k2.dz + 2*k3.dz + k4.dz);
+
+        trajectory.push(new THREE.Vector3(s.x, s.y, s.z));
+      }
+
+      // remove old line if exists
+      if (line) {
+        scene.remove(line);
+        line.geometry.dispose();
+      }
+
+      // build fresh geometry sized to params.steps
+      const geom = new THREE.BufferGeometry();
+      geom.setDrawRange(0, 0);
+      geom.setAttribute('position',
+        new THREE.BufferAttribute(new Float32Array(params.steps * 3), 3)
+      );
+      line = new THREE.Line(geom, material);
+      scene.add(line);
+
+      drawCount = 0;
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // extend the drawn portion by one point each frame
+      if (drawCount < trajectory.length) {
+        drawCount++;
+        line.geometry.setDrawRange(0, drawCount);
+        const pos = line.geometry.attributes.position.array;
+        for (let i = 0; i < drawCount; i++) {
+          pos[3*i  ] = trajectory[i].x;
+          pos[3*i+1] = trajectory[i].y;
+          pos[3*i+2] = trajectory[i].z;
+        }
+        line.geometry.attributes.position.needsUpdate = true;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>
