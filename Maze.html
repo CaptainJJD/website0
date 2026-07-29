@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3D Maze — Screensaver</title>
+<style>
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    gap:14px; flex-wrap:wrap; padding:14px; box-sizing:border-box;
+    background:#008080; font-family:Tahoma,"MS Sans Serif",sans-serif; font-size:12px;
+  }
+  .win{
+    background:#c0c0c0; padding:3px; align-self:flex-start;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf,
+                inset -2px -2px #808080, inset 2px 2px #fff, 4px 4px 10px rgba(0,0,0,.4);
+  }
+  #mazeWin{
+    resize:both; overflow:hidden;
+    width:660px; height:490px; min-width:280px; min-height:260px;
+    display:flex; flex-direction:column;
+  }
+  .titlebar{
+    background:linear-gradient(90deg,#000080,#1084d0); color:#fff; font-weight:bold;
+    padding:3px 4px; display:flex; align-items:center; gap:6px; user-select:none; flex:0 0 auto;
+  }
+  .titlebar .t{ flex:1; white-space:nowrap; overflow:hidden; }
+  .tb{
+    width:16px;height:14px; background:#c0c0c0; color:#000; font-size:9px; line-height:12px;
+    text-align:center; font-family:monospace; flex:0 0 auto;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  }
+  .body{ padding:6px; flex:1; display:flex; flex-direction:column; min-height:0; }
+  .viewwrap{
+    position:relative; flex:1; min-height:0;
+    border:2px solid; border-color:#808080 #fff #fff #808080;
+  }
+  #view{
+    width:100%; height:100%; display:block;
+    image-rendering:pixelated; image-rendering:crisp-edges;
+    background:#000;
+  }
+  .controls{ margin-top:6px; display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+  button{
+    font-family:inherit; font-size:12px; padding:4px 14px; background:#c0c0c0; border:none; cursor:pointer;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  }
+  button:active{
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+  }
+  #status{ margin-left:auto; color:#222; white-space:nowrap; }
+  #mapWin .body{ padding:6px; }
+  #minimap{
+    display:block; image-rendering:pixelated;
+    border:2px solid; border-color:#808080 #fff #fff #808080;
+  }
+</style>
+</head>
+<body>
+
+<div class="win" id="mazeWin">
+  <div class="titlebar">
+    <div class="t">🧱 3D Maze — Screensaver</div>
+    <div class="tb">_</div><div class="tb">□</div><div class="tb">✕</div>
+  </div>
+  <div class="body">
+    <div class="viewwrap" id="viewwrap">
+      <canvas id="view" width="320" height="200"></canvas>
+    </div>
+    <div class="controls">
+      <button id="btnNew">New Maze</button>
+      <button id="btnMap">Map (M)</button>
+      <button id="btnMode">Auto Solve: ON</button>
+      <span id="status">loading…</span>
+    </div>
+  </div>
+</div>
+
+<div class="win" id="mapWin" style="display:none">
+  <div class="titlebar">
+    <div class="t">🗺️ Map</div>
+    <div class="tb" id="mapClose" style="cursor:pointer">✕</div>
+  </div>
+  <div class="body">
+    <canvas id="minimap" width="186" height="186"></canvas>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============================== CONSTANTS ============================== */
+const TEX=64;
+const MAZE_W=15, MAZE_H=15;
+const MAP_W=MAZE_W*2+1, MAP_H=MAZE_H*2+1;
+const NUM_RATS=4, FOG_DIST=16;
+const MOVE_SPEED=3.4, TURN90=0.34, TURN180=0.58;
+const MANUAL_MOVE_SPEED=6.8, MANUAL_TURN90=0.20, MANUAL_TURN180=0.32;
+const BASE_ASPECT=320/200, BASE_PLANE=0.66;
+const DX=[1,0,-1,0], DY=[0,1,0,-1];                // E,S,W,N
+
+const view=document.getElementById('view'), ctx=view.getContext('2d');
+const mm=document.getElementById('minimap'), mctx=mm.getContext('2d');
+const statusEl=document.getElementById('status');
+const mapWin=document.getElementById('mapWin');
+const modeBtn=document.getElementById('btnMode');
+
+/* --- resizable internal framebuffer --- */
+let SW=320, SH=200, frame, buf, zbuf, planeLen=BASE_PLANE;
+function setInternalSize(cssW, cssH){
+  SH=200;
+  SW=Math.max(120, Math.min(800, Math.round(SH*(cssW/cssH))));
+  view.width=SW; view.height=SH;
+  frame=ctx.createImageData(SW,SH); buf=frame.data;
+  zbuf=new Float32Array(SW);
+  planeLen=BASE_PLANE*(SW/SH)/BASE_ASPECT;          // keep FOV undistorted
+}
+new ResizeObserver(entries=>{
+  const r=entries[0].contentRect;
+  if(r.width>10 && r.height>10) setInternalSize(r.width,r.height);
+}).observe(document.getElementById('viewwrap'));
+
+let map, goal, rats=[], solved=0, ratTextureMissing=false, ratDraws=[];
+let autoMode=true;
+let fade=0, fadeState='none', mapVisible=false;
+let texWall, texFloor, texCeil, texRat, texSmiley;
+
+const fogShade = d => Math.max(0.15, 1 - d/FOG_DIST);
+
+/* ============================== TEXTURES (procedural, except rat) ============================== */
+function makeTex(drawFn){
+  const c=document.createElement('canvas'); c.width=c.height=TEX;
+  const g=c.getContext('2d'); drawFn(g);
+  return { data:g.getImageData(0,0,TEX,TEX).data };
+}
+function noise(g, colors, n){
+  for(let i=0;i<n;i++){
+    g.fillStyle=colors[(Math.random()*colors.length)|0];
+    g.fillRect((Math.random()*TEX)|0,(Math.random()*TEX)|0,1,1);
+  }
+}
+const drawBrick=g=>{
+  g.fillStyle='#b8b0a4'; g.fillRect(0,0,TEX,TEX);
+  const cols=['#8e3b32','#96423a','#7f342c','#9a473d','#873a30'];
+  for(let row=0;row<8;row++){
+    const off=(row%2)*8;
+    for(let b=-1;b<5;b++){
+      g.fillStyle=cols[((row*5+b)%5+5)%5];
+      g.fillRect(b*16+off, row*8+1, 14, 6);
+    }
+  }
+  noise(g,['rgba(0,0,0,.18)','rgba(255,255,255,.12)'],350);
+};
+const drawSand=g=>{
+  g.fillStyle='#d2c4a2'; g.fillRect(0,0,TEX,TEX);
+  noise(g,['#c4b48e','#dfd2b2','#bfae86','#e6dabd'],2200);
+};
+const drawConcrete=g=>{
+  g.fillStyle='#9a9c9e'; g.fillRect(0,0,TEX,TEX);
+  noise(g,['#8d8f92','#a6a8aa','#87898c','#b0b2b4'],2000);
+  g.fillStyle='rgba(60,60,64,.5)'; g.fillRect(0,21,TEX,1); g.fillRect(0,43,TEX,1);
+};
+const drawSmiley=g=>{
+  g.clearRect(0,0,TEX,TEX);
+  g.fillStyle='#ffd800'; g.strokeStyle='#7a5c00'; g.lineWidth=2;
+  g.beginPath(); g.arc(32,32,26,0,7); g.fill(); g.stroke();
+  g.fillStyle='#000';
+  g.beginPath(); g.arc(23,25,3.4,0,7); g.fill();
+  g.beginPath(); g.arc(41,25,3.4,0,7); g.fill();
+  g.lineWidth=3; g.strokeStyle='#000';
+  g.beginPath(); g.arc(32,32,15,Math.PI*0.15,Math.PI*0.85); g.stroke();
+};
+
+/* rat.png is the ONLY image we load. It must sit beside this HTML file.
+   Chrome can block pixel-reading from file://, so this loader still accepts the
+   image and draws it directly even when getImageData() is blocked. */
+function loadRat(){
+  return new Promise(res=>{
+    const fail=()=>{ ratTextureMissing=true; res(null); };
+    const im=new Image();
+    im.onload=()=>{
+      const c=document.createElement('canvas'); c.width=c.height=TEX;
+      const g=c.getContext('2d');
+      const h=Math.min(TEX, im.height*(TEX/im.width));
+      g.clearRect(0,0,TEX,TEX);
+      g.drawImage(im,0,TEX-h,TEX,h);                   // bottom-align so feet touch floor
+
+      const tex={ data:null, image:c };
+      try{
+        const id=g.getImageData(0,0,TEX,TEX), d=id.data;
+        for(let i=0;i<d.length;i+=4)                   // chroma-key near-white bg
+          if(d[i]>222 && d[i+1]>222 && d[i+2]>222) d[i+3]=0;
+        tex.data=d;                                    // best mode: pixel sprite inside raycaster
+      }catch(e){
+        tex.imageOnly=true;                            // file:// safety mode: draw image after frame
+      }
+      ratTextureMissing=false;
+      res(tex);
+    };
+    im.onerror=fail;
+    im.src='./rat.png';
+  });
+}
+
+/* ============================== MAZE ============================== */
+const open=(cx,cy,d)=> map[(2*cy+1+DY[d])*MAP_W + (2*cx+1+DX[d])]===0;
+
+function genMaze(){
+  map=new Uint8Array(MAP_W*MAP_H).fill(1);
+  const vis=new Uint8Array(MAZE_W*MAZE_H);
+  const stack=[[0,0]]; vis[0]=1; map[MAP_W+1]=0;
+  while(stack.length){
+    const [cx,cy]=stack[stack.length-1], opts=[];
+    for(let d=0;d<4;d++){
+      const nx=cx+DX[d], ny=cy+DY[d];
+      if(nx>=0&&ny>=0&&nx<MAZE_W&&ny<MAZE_H&&!vis[ny*MAZE_W+nx]) opts.push(d);
+    }
+    if(!opts.length){ stack.pop(); continue; }
+    const d=opts[(Math.random()*opts.length)|0], nx=cx+DX[d], ny=cy+DY[d];
+    map[(2*cy+1+DY[d])*MAP_W + (2*cx+1+DX[d])]=0;
+    map[(2*ny+1)*MAP_W + (2*nx+1)]=0;
+    vis[ny*MAZE_W+nx]=1; stack.push([nx,ny]);
+  }
+}
+function farthestFrom(sx,sy){
+  const dist=new Int16Array(MAZE_W*MAZE_H).fill(-1);
+  dist[sy*MAZE_W+sx]=0;
+  const q=[[sx,sy]]; let best=[sx,sy], bd=0;
+  while(q.length){
+    const [cx,cy]=q.shift();
+    for(let d=0;d<4;d++) if(open(cx,cy,d)){
+      const nx=cx+DX[d], ny=cy+DY[d], i=ny*MAZE_W+nx;
+      if(dist[i]<0){
+        dist[i]=dist[cy*MAZE_W+cx]+1;
+        if(dist[i]>bd){ bd=dist[i]; best=[nx,ny]; }
+        q.push([nx,ny]);
+      }
+    }
+  }
+  return best;
+}
+
+/* ============================== CAMERA (auto solve + manual arrows) ============================== */
+const cam={};
+function resetCam(){
+  cam.cx=0; cam.cy=0; cam.x=1.5; cam.y=1.5;
+  cam.facing=0;
+  for(let d=0;d<4;d++) if(open(0,0,d)){ cam.facing=d; break; }
+  cam.angle=cam.facing*Math.PI/2;
+  cam.state=autoMode ? 'decide' : 'idle';
+  cam.t=0; cam.moveAfterTurn=false;
+}
+function reachedGoal(){
+  if(cam.cx===goal.cx && cam.cy===goal.cy){
+    solved++; fadeState='out';
+    return true;
+  }
+  return false;
+}
+function startMove(moveDir=cam.facing, speed=MOVE_SPEED){
+  if(!open(cam.cx,cam.cy,moveDir)){
+    cam.state=autoMode ? 'decide' : 'idle';
+    return false;
+  }
+  cam.fx=2*cam.cx+1.5; cam.fy=2*cam.cy+1.5;
+  cam.ncx=cam.cx+DX[moveDir]; cam.ncy=cam.cy+DY[moveDir];
+  cam.tx=2*cam.ncx+1.5; cam.ty=2*cam.ncy+1.5;
+  cam.dur=2/speed; cam.t=0; cam.state='move';
+  return true;
+}
+function startTurn(nf, moveAfterTurn=false, turn90=TURN90, turn180=TURN180){
+  const diff=(nf-cam.facing+4)%4;
+  if(diff===0){ cam.state=autoMode ? 'decide' : 'idle'; return false; }
+  cam.a0=cam.angle;
+  cam.a1=cam.a0 + (diff===1 ? Math.PI/2 : diff===3 ? -Math.PI/2 : Math.PI);
+  cam.dur=(diff===2)?turn180:turn90;
+  cam.t=0; cam.nf=nf; cam.moveAfterTurn=moveAfterTurn; cam.state='turn';
+  return true;
+}
+function autoDecide(){
+  if(reachedGoal()) return;
+  const f=cam.facing;
+  const order=[(f+1)%4, f, (f+3)%4, (f+2)%4];        // right, straight, left, back
+  const nf=order.find(d=>open(cam.cx,cam.cy,d));
+  if(nf===undefined) return;
+  (nf===f) ? startMove() : startTurn(nf,true);
+}
+function advanceCamMotion(dt){
+  if(cam.state==='turn'){
+    cam.t+=dt;
+    let k=Math.min(1,cam.t/cam.dur); k=k*k*(3-2*k);
+    cam.angle=cam.a0+(cam.a1-cam.a0)*k;
+    if(cam.t>=cam.dur){
+      const rem=cam.t-cam.dur;
+      const shouldMove=cam.moveAfterTurn && autoMode;
+      cam.facing=cam.nf; cam.angle=cam.nf*Math.PI/2; cam.moveAfterTurn=false;
+      if(shouldMove){
+        startMove();
+        if(rem>0) advanceCamMotion(rem);
+      } else {
+        cam.state=autoMode ? 'decide' : 'idle';
+        if(autoMode && rem>0 && fadeState==='none') updateCam(rem);
+      }
+    }
+  } else if(cam.state==='move'){
+    cam.t+=dt;
+    const k=Math.min(1,cam.t/cam.dur);
+    cam.x=cam.fx+(cam.tx-cam.fx)*k;
+    cam.y=cam.fy+(cam.ty-cam.fy)*k;
+    if(cam.t>=cam.dur){
+      const rem=cam.t-cam.dur;
+      cam.cx=cam.ncx; cam.cy=cam.ncy;
+      cam.x=cam.tx; cam.y=cam.ty;
+      cam.state=autoMode ? 'decide' : 'idle';
+      if(reachedGoal()) return;
+      if(autoMode && rem>0 && fadeState==='none') updateCam(rem);
+    }
+  }
+}
+function updateCam(dt){
+  if(autoMode){
+    if(cam.state==='idle') cam.state='decide';
+    if(cam.state==='decide') autoDecide();
+  } else if(cam.state==='decide'){
+    cam.state='idle';
+  }
+  advanceCamMotion(dt);
+}
+function canManualInput(){
+  return !autoMode && fadeState==='none' && (cam.state==='idle' || cam.state==='decide');
+}
+function manualForward(){
+  if(!canManualInput()) return;
+  if(cam.state==='decide') cam.state='idle';
+  startMove(cam.facing, MANUAL_MOVE_SPEED);
+}
+function manualBackward(){
+  if(!canManualInput()) return;
+  if(cam.state==='decide') cam.state='idle';
+  startMove((cam.facing+2)%4, MANUAL_MOVE_SPEED);
+}
+function manualTurn(offset){
+  if(!canManualInput()) return;
+  if(cam.state==='decide') cam.state='idle';
+  startTurn((cam.facing+offset+4)%4,false,MANUAL_TURN90,MANUAL_TURN180);
+}
+
+/* ============================== RATS ============================== */
+function newRat(){
+  let cx,cy;
+  do{ cx=(Math.random()*MAZE_W)|0; cy=(Math.random()*MAZE_H)|0; }while(cx<3&&cy<3);
+  return { cx,cy, x:2*cx+1.5, y:2*cy+1.5, dir:-1, moving:false,
+           t:0, dur:1, speed:3.5+Math.random()*1.5, bob:Math.random()*7, vx:1, vy:0 };
+}
+function updateRat(r,dt){
+  if(!r.moving){
+    const opts=[];
+    for(let d=0;d<4;d++) if(open(r.cx,r.cy,d)) opts.push(d);
+    let choices=opts.filter(d=>d!==(r.dir+2)%4);
+    if(!choices.length) choices=opts;
+    const d=choices[(Math.random()*choices.length)|0];
+    r.dir=d; r.vx=DX[d]; r.vy=DY[d];
+    r.fx=2*r.cx+1.5; r.fy=2*r.cy+1.5;
+    r.ncx=r.cx+DX[d]; r.ncy=r.cy+DY[d];
+    r.tx=2*r.ncx+1.5; r.ty=2*r.ncy+1.5;
+    r.dur=2/r.speed; r.t=0; r.moving=true;
+  }
+  r.t+=dt; r.bob+=dt*14;
+  const k=Math.min(1,r.t/r.dur);
+  r.x=r.fx+(r.tx-r.fx)*k; r.y=r.fy+(r.ty-r.fy)*k;
+  if(r.t>=r.dur){ r.cx=r.ncx; r.cy=r.ncy; r.moving=false; }
+}
+
+/* ============================== RENDER ============================== */
+function render(time){
+  const dirX=Math.cos(cam.angle), dirY=Math.sin(cam.angle);
+  const planeX=-dirY*planeLen, planeY=dirX*planeLen;
+  const fT=texFloor.data, cT=texCeil.data, wT=texWall.data;
+  const halfH=SH/2;
+
+  /* --- floor & ceiling casting --- */
+  for(let y=halfH; y<SH; y++){
+    const rowDist=(SH*0.5)/(y-halfH+0.5);
+    const sh=fogShade(rowDist), csh=sh*0.8;
+    const stepX=rowDist*2*planeX/SW, stepY=rowDist*2*planeY/SW;
+    let fx=cam.x+rowDist*(dirX-planeX), fy=cam.y+rowDist*(dirY-planeY);
+    let fi=y*SW*4, ci=(SH-1-y)*SW*4;
+    for(let x=0;x<SW;x++){
+      const ti=((((fy-Math.floor(fy))*TEX)|0)*TEX + (((fx-Math.floor(fx))*TEX)|0))*4;
+      buf[fi]=fT[ti]*sh; buf[fi+1]=fT[ti+1]*sh; buf[fi+2]=fT[ti+2]*sh; buf[fi+3]=255;
+      buf[ci]=cT[ti]*csh; buf[ci+1]=cT[ti+1]*csh; buf[ci+2]=cT[ti+2]*csh; buf[ci+3]=255;
+      fi+=4; ci+=4; fx+=stepX; fy+=stepY;
+    }
+  }
+
+  /* --- walls (DDA raycast) --- */
+  for(let x=0;x<SW;x++){
+    const cameraX=2*x/SW-1;
+    const rdx=dirX+planeX*cameraX, rdy=dirY+planeY*cameraX;
+    let mx=cam.x|0, my=cam.y|0;
+    const ddx=Math.abs(1/(rdx||1e-9)), ddy=Math.abs(1/(rdy||1e-9));
+    let sx,sy,sdX,sdY;
+    if(rdx<0){ sx=-1; sdX=(cam.x-mx)*ddx; } else { sx=1; sdX=(mx+1-cam.x)*ddx; }
+    if(rdy<0){ sy=-1; sdY=(cam.y-my)*ddy; } else { sy=1; sdY=(my+1-cam.y)*ddy; }
+    let side=0, guard=0;
+    while(guard++<80){
+      if(sdX<sdY){ sdX+=ddx; mx+=sx; side=0; } else { sdY+=ddy; my+=sy; side=1; }
+      if(mx<0||my<0||mx>=MAP_W||my>=MAP_H||map[my*MAP_W+mx]) break;
+    }
+    const perp=side===0? sdX-ddx : sdY-ddy;
+    zbuf[x]=perp;
+    const lineH=(SH/perp)|0;
+    let dS=((SH-lineH)>>1), dE=dS+lineH;
+    const step=TEX/lineH;
+    let texPos=(Math.max(0,dS)-halfH+lineH/2)*step;
+    if(dS<0)dS=0; if(dE>SH)dE=SH;
+    let wallX = side===0? cam.y+perp*rdy : cam.x+perp*rdx;
+    wallX-=Math.floor(wallX);
+    let texX=(wallX*TEX)|0;
+    if((side===0&&rdx>0)||(side===1&&rdy<0)) texX=TEX-1-texX;
+    const sh=fogShade(perp)*(side?0.72:1);
+    let bi=(dS*SW+x)*4;
+    for(let y=dS;y<dE;y++){
+      let ty=texPos|0; if(ty>TEX-1)ty=TEX-1; if(ty<0)ty=0;
+      texPos+=step;
+      const ti=(ty*TEX+texX)*4;
+      buf[bi]=wT[ti]*sh; buf[bi+1]=wT[ti+1]*sh; buf[bi+2]=wT[ti+2]*sh; buf[bi+3]=255;
+      bi+=SW*4;
+    }
+  }
+
+  /* --- sprites: rats + goal smiley --- */
+  ratDraws.length=0;
+  const sprites=[];
+  const invDet=1/(planeX*dirY-dirX*planeY);
+
+  if(texRat){
+    for(const r of rats){
+      const ratSprite={ x:r.x, y:r.y, scale:0.55, wf:1,
+        bob:Math.abs(Math.sin(r.bob))*3*(SH/200), flip:(r.vx*planeX+r.vy*planeY)<0, floaty:false };
+      if(texRat.data){
+        sprites.push({ ...ratSprite, tex:texRat.data });
+      } else if(texRat.image){
+        const spx=ratSprite.x-cam.x, spy=ratSprite.y-cam.y;
+        const trX=invDet*(dirY*spx-dirX*spy);
+        const trY=invDet*(-planeY*spx+planeX*spy);
+        if(trY>=0.15){
+          const screenX=(SW/2)*(1+trX/trY);
+          const h=(SH/trY)*ratSprite.scale;
+          const wpx=h*ratSprite.wf;
+          const vms=((1-ratSprite.scale)*0.5*SH - ratSprite.bob)/trY;
+          const sx0=(screenX-wpx/2)|0, sx1=(screenX+wpx/2)|0;
+          const sy0=(halfH-h/2+vms)|0, sy1=(halfH+h/2+vms)|0;
+          if(sx1>sx0 && sy1>sy0) ratDraws.push({
+            image:texRat.image, sx0, sx1, sy0, sy1, trY, flip:ratSprite.flip, sh:fogShade(trY)
+          });
+        }
+      }
+    }
+  }
+
+  sprites.push({ x:goal.x, y:goal.y, tex:texSmiley.data, scale:0.5,
+    wf:Math.abs(Math.cos(time*0.0025))*0.85+0.15, bob:0, flip:false, floaty:true,
+    fl:Math.sin(time*0.003)*6 });
+  sprites.sort((a,b)=>
+    ((b.x-cam.x)**2+(b.y-cam.y)**2) - ((a.x-cam.x)**2+(a.y-cam.y)**2));
+
+  for(const s of sprites){
+    const spx=s.x-cam.x, spy=s.y-cam.y;
+    const trX=invDet*(dirY*spx-dirX*spy);
+    const trY=invDet*(-planeY*spx+planeX*spy);
+    if(trY<0.15) continue;
+    const screenX=(SW/2)*(1+trX/trY);
+    const h=(SH/trY)*s.scale, w=h*s.wf*(SW/SH)/BASE_ASPECT*(BASE_ASPECT*SH/SW)||h*s.wf;
+    const wpx=h*s.wf;                                  // square texels: width == height*wf
+    if(wpx<1||h<1) continue;
+    const vms = s.floaty ? s.fl/trY : ((1-s.scale)*0.5*SH - s.bob)/trY;
+    const sx0=(screenX-wpx/2)|0, sx1=(screenX+wpx/2)|0;
+    const sy0=(halfH-h/2+vms)|0, sy1=(halfH+h/2+vms)|0;
+    if(sx1<=sx0||sy1<=sy0) continue;
+    const sh=fogShade(trY);
+    for(let x=Math.max(0,sx0); x<Math.min(SW,sx1); x++){
+      if(trY>=zbuf[x]) continue;
+      let tx=(((x-sx0)/(sx1-sx0))*TEX)|0;
+      if(s.flip) tx=TEX-1-tx;
+      for(let y=Math.max(0,sy0); y<Math.min(SH,sy1); y++){
+        const ty=(((y-sy0)/(sy1-sy0))*TEX)|0;
+        const ti=(ty*TEX+tx)*4;
+        if(s.tex[ti+3]<128) continue;
+        const bi=(y*SW+x)*4;
+        buf[bi]=s.tex[ti]*sh; buf[bi+1]=s.tex[ti+1]*sh; buf[bi+2]=s.tex[ti+2]*sh;
+      }
+    }
+  }
+}
+
+/* ============================== MINIMAP (own window) ============================== */
+function drawMinimap(){
+  const S=6;
+  mctx.fillStyle='#111'; mctx.fillRect(0,0,mm.width,mm.height);
+  for(let y=0;y<MAP_H;y++)for(let x=0;x<MAP_W;x++){
+    mctx.fillStyle = map[y*MAP_W+x] ? '#7a2e2e' : '#d8c9a3';
+    mctx.fillRect(x*S,y*S,S,S);
+  }
+  mctx.fillStyle='#ffd800';
+  mctx.fillRect((goal.x-0.6)*S,(goal.y-0.6)*S,1.2*S,1.2*S);
+  mctx.fillStyle='#d22';
+  for(const r of rats){ mctx.beginPath(); mctx.arc(r.x*S,r.y*S,2.6,0,7); mctx.fill(); }
+  mctx.save();
+  mctx.translate(cam.x*S,cam.y*S); mctx.rotate(cam.angle);
+  mctx.fillStyle='#0c0';
+  mctx.beginPath(); mctx.moveTo(6,0); mctx.lineTo(-3.5,-4); mctx.lineTo(-3.5,4); mctx.fill();
+  mctx.restore();
+}
+
+/* ============================== GAME FLOW ============================== */
+function buildMaze(){
+  genMaze();
+  const g=farthestFrom(0,0);
+  goal={ cx:g[0], cy:g[1], x:2*g[0]+1.5, y:2*g[1]+1.5 };
+  resetCam();
+  rats=[];
+  if(texRat) for(let i=0;i<NUM_RATS;i++) rats.push(newRat());
+  updateStatus();
+}
+function updateStatus(){
+  modeBtn.textContent=autoMode ? 'Auto Solve: ON' : 'Manual: Arrow Keys';
+  statusEl.textContent=`15×15 · mode: ${autoMode?'auto':'manual'} · rats: ${rats.length} · solved: ${solved}`+
+    (ratTextureMissing?' · rat.png not found':'');
+}
+
+function drawQueuedRatSprites(){
+  if(!ratDraws.length) return;
+  ctx.save();
+  ctx.imageSmoothingEnabled=false;
+  for(const s of ratDraws){
+    const drawW=s.sx1-s.sx0, drawH=s.sy1-s.sy0;
+    if(drawW<=0||drawH<=0) continue;
+    const imgW=s.image.width||TEX, imgH=s.image.height||TEX;
+    ctx.globalAlpha=s.sh;
+    for(let x=Math.max(0,s.sx0); x<Math.min(SW,s.sx1); x++){
+      if(s.trY>=zbuf[x]) continue;
+      let u=(x-s.sx0)/drawW;
+      if(s.flip) u=1-u;
+      const srcX=Math.max(0,Math.min(imgW-1,(u*imgW)|0));
+      ctx.drawImage(s.image, srcX, 0, 1, imgH, x, s.sy0, 1, drawH);
+    }
+  }
+  ctx.restore();
+}
+
+let last=0;
+function loop(t){
+  const dt=Math.min(0.05,(t-last)/1000||0); last=t;
+  if(fadeState==='none') updateCam(dt);
+  for(const r of rats) updateRat(r,dt);
+  if(fadeState==='out'){ fade+=dt*2; if(fade>=1){ fade=1; buildMaze(); fadeState='in'; } }
+  else if(fadeState==='in'){ fade-=dt*2; if(fade<=0){ fade=0; fadeState='none'; } }
+
+  render(t);
+  ctx.putImageData(frame,0,0);
+  drawQueuedRatSprites();
+  if(fade>0){ ctx.fillStyle=`rgba(0,0,0,${fade})`; ctx.fillRect(0,0,SW,SH); }
+  if(mapVisible) drawMinimap();
+  requestAnimationFrame(loop);
+}
+
+/* ============================== UI ============================== */
+document.getElementById('btnNew').onclick=()=>{ if(fadeState==='none') fadeState='out'; };
+function toggleMap(force){
+  mapVisible = force!==undefined ? force : !mapVisible;
+  mapWin.style.display = mapVisible ? '' : 'none';
+}
+document.getElementById('btnMap').onclick=()=>toggleMap();
+modeBtn.onclick=()=>{
+  autoMode=!autoMode;
+  if(autoMode && cam.state==='idle') cam.state='decide';
+  if(!autoMode && cam.state==='decide') cam.state='idle';
+  cam.moveAfterTurn = autoMode && cam.moveAfterTurn;
+  updateStatus();
+};
+document.getElementById('mapClose').onclick=()=>toggleMap(false);
+addEventListener('keydown',e=>{
+  if(e.key==='m'||e.key==='M'){ toggleMap(); return; }
+  if(e.key==='ArrowUp' || e.key==='ArrowDown' || e.key==='ArrowLeft' || e.key==='ArrowRight'){
+    e.preventDefault();
+    if(autoMode) return;
+    if(e.key==='ArrowUp') manualForward();
+    else if(e.key==='ArrowDown') manualBackward();
+    else if(e.key==='ArrowLeft') manualTurn(3);
+    else if(e.key==='ArrowRight') manualTurn(1);
+  }
+});
+
+/* ============================== BOOT ============================== */
+texWall=makeTex(drawBrick);
+texFloor=makeTex(drawSand);
+texCeil=makeTex(drawConcrete);
+texSmiley=makeTex(drawSmiley);
+const vw=document.getElementById('viewwrap').getBoundingClientRect();
+setInternalSize(vw.width||640, vw.height||400);
+loadRat().then(r=>{
+  texRat=r;
+  buildMaze();
+  requestAnimationFrame(loop);
+});
+</script>
+</body>
+</html>
