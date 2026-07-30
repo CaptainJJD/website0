@@ -69,7 +69,7 @@
     <div class="controls">
       <button id="btnNew">New Maze</button>
       <button id="btnMap">Map (M)</button>
-      <button id="btnMode">Auto Solve: ON</button>
+      <button id="btnMode">Manual Mode</button>
       <span id="status">loading…</span>
 	  <p></p>
 	  <a HREF="https://www.Dzikiewi.cz" font-size:28px>Back to Homepage</a>
@@ -524,7 +524,7 @@ function buildMaze(){
   updateStatus();
 }
 function updateStatus(){
-  modeBtn.textContent=autoMode ? 'Auto Solve: ON' : 'Manual: Arrow Keys';
+  modeBtn.textContent=autoMode ? 'Manual Mode' : 'Auto Solve';
   statusEl.textContent=`15×15 · mode: ${autoMode?'auto':'manual'} · rats: ${rats.length} · solved: ${solved}`+
     (ratTextureMissing?' · rat.png not found':'');
 }
