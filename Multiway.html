@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wolfram Physics: Monad & Multi-Edge Visualizer</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; color: #eee; font-family: 'Segoe UI', sans-serif; }
+        #graph-container { width: 100vw; height: 100vh; position: absolute; top:0; left:0; z-index: 1; }
+        
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            pointer-events: auto;
+            max-width: 300px;
+            z-index: 10;
+        }
+
+        h1 { font-size: 18px; margin: 0 0 10px 0; color: #a980f5; }
+        
+        select {
+            width: 100%;
+            background: #222;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .controls { display: flex; gap: 10px; margin-bottom: 10px; }
+        
+        button {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        button:hover { background: #555; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .legend { margin-top: 10px; font-size: 11px; color:#aaa; }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+    </style>
+    
+    <script src="//unpkg.com/3d-force-graph/dist/3d-force-graph.min.js"></script>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <h1>Wolfram Rule Visualizer</h1>
+        
+        <label for="init-select" style="font-size:12px; color:#aaa;">Initial Condition:</label>
+        <select id="init-select" onchange="resetGraph()">
+            <option value="monad">Monad (2 Loops)</option>
+            <option value="v-shape">Standard (V-Shape)</option>
+        </select>
+
+        <div class="controls">
+            <button id="btn-prev" onclick="prevStep()">&#8592;</button>
+            <span id="step-counter" style="color: #00d2ff; font-family:monospace; align-self:center;">Step: 0</span>
+            <button id="btn-next" onclick="nextStep()">&#8594;</button>
+        </div>
+        
+        <div class="legend">
+            <div><span class="dot" style="background: #a980f5;"></span>Existing Node</div>
+            <div><span class="dot" style="background: #00d2ff;"></span>New Node (w)</div>
+        </div>
+    </div>
+
+    <div id="graph-container"></div>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        let stepIndex = 0;
+        let history = []; 
+        let nodeIdCounter = 0; 
+        const uuid = () => `n-${++nodeIdCounter}`;
+
+        // --- 2. INITIAL CONDITIONS ---
+        function getInitialState(type) {
+            nodeIdCounter = 0; 
+            
+            if (type === 'monad') {
+                // THE FIX: We add a 'curveOffset' property so the visualizer separates them
+                const root = "root";
+                return {
+                    nodes: [ { id: root, color: '#a980f5' } ],
+                    links: [
+                        // Two distinct edges pointing to self
+                        { source: root, target: root, color: '#00d2ff', curveOffset: 0.5 }, 
+                        { source: root, target: root, color: '#a980f5', curveOffset: -0.5 }
+                    ]
+                };
+            } else {
+                const x = "root", y = "start-y", z = "start-z";
+                return {
+                    nodes: [ { id: x }, { id: y }, { id: z } ].map(n => ({...n, color: '#a980f5'})),
+                    links: [
+                        { source: x, target: y, color: '#00d2ff', curveOffset: 0 }, 
+                        { source: x, target: z, color: '#a980f5', curveOffset: 0 }
+                    ]
+                };
+            }
+        }
+
+        // --- 3. RULE LOGIC (Wolfram Model) ---
+        function applyRule(graphData) {
+            // 1. Clean Data & Clone
+            const cleanNodes = graphData.nodes.map(n => ({ id: n.id, color: '#a980f5' }));
+            const cleanLinks = graphData.links.map(l => ({ 
+                source: typeof l.source === 'object' ? l.source.id : l.source,
+                target: typeof l.target === 'object' ? l.target.id : l.target,
+                // Reset curve offset for next gen, we will recalculate visuals later
+                curveOffset: 0 
+            }));
+
+            let newLinks = [];
+            let newNodes = []; 
+            const consumedLinks = new Set(); // Track rewritten edges
+
+            // 2. Group edges by Source to find pairs
+            const edgesBySource = {};
+            cleanLinks.forEach(link => {
+                const s = link.source;
+                if (!edgesBySource[s]) edgesBySource[s] = [];
+                edgesBySource[s].push(link);
+            });
+
+            // 3. Apply Rule {{x,y}, {x,z}} -> {{x,z}, {x,w}, {y,w}, {z,w}}
+            Object.keys(edgesBySource).forEach(sourceId => {
+                const outgoing = edgesBySource[sourceId];
+                
+                // We need at least 2 edges to trigger the rule
+                if (outgoing.length >= 2) {
+                    const edge1 = outgoing[0]; // x -> y
+                    const edge2 = outgoing[1]; // x -> z
+                    
+                    const x = sourceId;
+                    const y = edge1.target;
+                    const z = edge2.target;
+
+                    // Create w
+                    const w = uuid();
+                    newNodes.push({ id: w, color: '#00d2ff', val: 5 });
+
+                    // Generate Output Edges
+                    // Note: We assign arbitrary curveOffsets to help visualize parallel lines
+                    newLinks.push({ source: x, target: z, curveOffset: 0.2 }); // preserved edge
+                    newLinks.push({ source: x, target: w, curveOffset: 0 });
+                    newLinks.push({ source: y, target: w, curveOffset: 0.2 });
+                    newLinks.push({ source: z, target: w, curveOffset: -0.2 });
+
+                    consumedLinks.add(edge1);
+                    consumedLinks.add(edge2);
+                }
+            });
+
+            // 4. Carry over unused edges
+            cleanLinks.forEach(l => {
+                if (!consumedLinks.has(l)) newLinks.push(l);
+            });
+
+            return { nodes: [...cleanNodes, ...newNodes], links: newLinks };
+        }
+
+        // --- 4. VISUALIZATION ENGINE ---
+        const elem = document.getElementById('graph-container');
+        
+        const Graph = ForceGraph3D()
+            (elem)
+            .nodeLabel('id')
+            .nodeColor('color')
+            .nodeRelSize(6)
+            .linkColor(l => l.color || '#888')
+            .linkDirectionalArrowLength(4)
+            .linkDirectionalArrowRelPos(1)
+            // THE VISUAL FIX: Use the curveOffset we stored in the data
+            .linkCurvature(d => {
+                // If it's a self-loop, curve it a lot
+                if (d.source === d.target) return d.curveOffset || 0.5;
+                // If it's a normal edge, curve it slightly if we flagged it (to separate parallel lines)
+                return d.curveOffset || 0;
+            })
+            .backgroundColor('#111');
+
+        // --- 5. APP CONTROLLERS ---
+        function resetGraph() {
+            const type = document.getElementById('init-select').value;
+            stepIndex = 0;
+            history = [JSON.parse(JSON.stringify(getInitialState(type)))];
+            updateGraph();
+            Graph.cameraPosition({ x: 0, y: 0, z: 200 }); 
+        }
+
+        function updateGraph() {
+            const dataClone = JSON.parse(JSON.stringify(history[stepIndex]));
+            document.getElementById('step-counter').innerText = `Step: ${stepIndex}`;
+            document.getElementById('btn-prev').disabled = stepIndex === 0;
+            Graph.graphData(dataClone);
+        }
+
+        function nextStep() {
+            if (stepIndex === history.length - 1) {
+                history.push(applyRule(history[stepIndex]));
+            }
+            stepIndex++;
+            updateGraph();
+        }
+
+        function prevStep() {
+            if (stepIndex > 0) {
+                stepIndex--;
+                updateGraph();
+            }
+        }
+
+        resetGraph(); // Start
+    </script>
+</body>
+</html>
