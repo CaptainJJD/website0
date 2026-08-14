@@ -39,7 +39,16 @@
     image-rendering:pixelated; image-rendering:crisp-edges;
     background:#000;
   }
-  .controls{ margin-top:6px; display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+  .controls{ margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:0 0 auto; }
+  .manual-pad{
+    margin-top:6px; display:none; grid-template-columns:repeat(3,44px); grid-template-rows:repeat(2,36px);
+    gap:4px; justify-content:center; flex:0 0 auto;
+  }
+  .manual-pad button{
+    padding:0; width:44px; height:36px; font-size:18px; line-height:36px;
+    touch-action:manipulation; user-select:none; -webkit-user-select:none;
+  }
+  .pad-spacer{ width:44px; height:36px; }
   button{
     font-family:inherit; font-size:12px; padding:4px 14px; background:#c0c0c0; border:none; cursor:pointer;
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
@@ -74,6 +83,14 @@
 	  <p></p>
 	  <a HREF="https://www.Dzikiewi.cz" font-size:28px>Back to Homepage</a>
     </div>
+    <div class="manual-pad" id="manualPad" aria-label="Manual maze controls">
+      <span class="pad-spacer"></span>
+      <button id="btnUp" aria-label="Move forward">▲</button>
+      <span class="pad-spacer"></span>
+      <button id="btnLeft" aria-label="Turn left">◀</button>
+      <button id="btnDown" aria-label="Move backward">▼</button>
+      <button id="btnRight" aria-label="Turn right">▶</button>
+    </div>
   </div>
 </div>
 
@@ -104,6 +121,7 @@ const mm=document.getElementById('minimap'), mctx=mm.getContext('2d');
 const statusEl=document.getElementById('status');
 const mapWin=document.getElementById('mapWin');
 const modeBtn=document.getElementById('btnMode');
+const manualPad=document.getElementById('manualPad');
 
 /* --- resizable internal framebuffer --- */
 let SW=320, SH=200, frame, buf, zbuf, planeLen=BASE_PLANE;
@@ -525,8 +543,11 @@ function buildMaze(){
 }
 function updateStatus(){
   modeBtn.textContent=autoMode ? 'Manual Mode' : 'Auto Solve';
-  statusEl.textContent=`15×15 · mode: ${autoMode?'auto':'manual'} · rats: ${rats.length} · solved: ${solved}`+
-    (ratTextureMissing?' · rat.png not found':'');
+  manualPad.style.display=autoMode ? 'none' : 'grid';
+  statusEl.textContent=autoMode
+    ? `15×15 · mode: auto · rats: ${rats.length} · solved: ${solved}`
+    : `15×15 · mode: manual — Use Arrow Keys · rats: ${rats.length} · solved: ${solved}`;
+  if(ratTextureMissing) statusEl.textContent+=' · rat.png not found';
 }
 
 function drawQueuedRatSprites(){
@@ -580,6 +601,12 @@ modeBtn.onclick=()=>{
   updateStatus();
 };
 document.getElementById('mapClose').onclick=()=>toggleMap(false);
+
+// On-screen manual controls for touch/mobile users.
+document.getElementById('btnUp').onclick=manualForward;
+document.getElementById('btnDown').onclick=manualBackward;
+document.getElementById('btnLeft').onclick=()=>manualTurn(3);
+document.getElementById('btnRight').onclick=()=>manualTurn(1);
 addEventListener('keydown',e=>{
   if(e.key==='m'||e.key==='M'){ toggleMap(); return; }
   if(e.key==='ArrowUp' || e.key==='ArrowDown' || e.key==='ArrowLeft' || e.key==='ArrowRight'){

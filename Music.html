@@ -64,7 +64,7 @@ body {
             height: 100vh;
         }
         #hiddenSection {
-            display: none;
+            display: block;
             margin-top: 20px;
             padding: 20px;
             background-color: #transparent;
@@ -146,7 +146,28 @@ body {
 <br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
 <!------------------------------>
 
-&nbsp; &nbsp; <span style="font-family: 'Courier New'; font-size: 38px; color: #00F5D4; background-color: #FF006E;">Tech-Oh' No!</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: Cyan; font-style: italic; background-color: #1F2937">Techno</span>
+&nbsp; &nbsp; <span style="font-family: Georgia, serif; font-size: 38px; color: #FFE5E5; background-color: #8B1E3F;">Super Minimal</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: #FFB3C6; font-style: italic; background-color: #2B193D">Experimental</span>
+<p></p>
+
+&nbsp; <audio controls>
+  <source src="https://storage.googleapis.com/xovox/SuperMinimal.wav" type="audio/wav">
+</audio>
+<p></p>
+
+<!------------------------------>
+<br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
+<!------------------------------>
+
+&nbsp; &nbsp; <span style="font-family: 'Trebuchet MS', sans-serif; font-size: 38px; color: #E0FBFC; background-color: #3D5A80;">It's just Dubstep</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: #FFD166; font-style: italic; background-color: #293241">Dubstep</span>
+<p></p>
+
+&nbsp; <audio controls>
+  <source src="https://storage.googleapis.com/xovox/JustDub.wav" type="audio/wav">
+</audio>
+<p></p>	
+
+<!------------------------------>
+<br></br>   <!------------------------------> <!------------------------------> &nbsp; &nbsp; <span style="font-family: 'Courier New'; font-size: 38px; color: #00F5D4; background-color: #FF006E;">Tech-Oh' No!</span> &nbsp;&nbsp;&nbsp; genre: &nbsp; <span style="font-family: 'Tahoma', serif; font-size: 23px; color: Cyan; font-style: italic; background-color: #1F2937">Techno</span>
 <p></p>
 
 &nbsp; <audio controls>
@@ -170,6 +191,11 @@ body {
 
 <!------------------------------>
 <br></br>   <!------------------------------> <!------------------------------> <!------------------------------>
+<!------------------------------>
+
+
+
+<!------------------------------>
 <!------------------------------>
 
 
@@ -284,14 +310,6 @@ body {
 <p></p>
 &nbsp; <audio controls>
   <source src="https://storage.googleapis.com/xovox/Synthwave.wav" type="audio/wav">
-</audio>
-	<!------------------------------>
-<!------------------------------>
-<br></br>
-&nbsp; &nbsp; <span style="font-family: 'consolas'; font-size: 20px; color: black; background-color: lightgray">Super Minimal</span> 
-<p></p>
-&nbsp; <audio controls>
-  <source src="https://storage.googleapis.com/xovox/SuperMinimal.wav" type="audio/wav">
 </audio>
 	<!------------------------------>
 <!------------------------------>
@@ -421,7 +439,6 @@ function toggleVideo(videoId) {
 <script>
         function revealAndScroll() {
             let section = document.getElementById("hiddenSection");
-            section.style.display = "block";
             section.scrollIntoView({ behavior: "smooth" });
         }
     </script>
