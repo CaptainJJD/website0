@@ -44,6 +44,20 @@ body {
 <div class="scrollable-content">
     <p></p>
 
+<script>
+document.addEventListener("play", function(event) {
+    if (event.target.tagName === "AUDIO") {
+        const allAudio = document.querySelectorAll("audio");
+
+        allAudio.forEach(function(audio) {
+            if (audio !== event.target) {
+                audio.pause();
+            }
+        });
+    }
+}, true);
+</script>
+
 <!---------------------------------------------------------------------------------->
 <!---------------------------------------------------------------------------------->
 </body>
@@ -444,5 +458,7 @@ function toggleVideo(videoId) {
     </script>
 
     </div> <!----scrollable div>
+	
+	
 </body>
 </html>
