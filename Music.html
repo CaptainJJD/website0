@@ -236,7 +236,7 @@ document.addEventListener("play", function(event) {
 <br></br>
 &nbsp; &nbsp; <button style="padding: 15px 30px; font-size: 18px;" onclick="toggleVideo('ZV')">Open viewer</button>
 &nbsp; &nbsp; <div id="ZV" class="videoContainer">
-  <iframe width="576" height="324" autoplay=false src="https://storage.googleapis.com/xovox/HarmoniousIntegers.mp4" frameborder="0" allowfullscreen></iframe> 
+  <video width="576" height="324" controls preload="none" playsinline data-src="https://storage.googleapis.com/xovox/HarmoniousIntegers.mp4"></video> 
 </div>
 <p></p>
 
@@ -256,7 +256,7 @@ document.addEventListener("play", function(event) {
 <br></br>
 &nbsp; &nbsp; <button style="padding: 15px 30px; font-size: 18px;" onclick="toggleVideo('PW')">Open Oscilliscope viewer</button>
 &nbsp; &nbsp; <div id="PW" class="videoContainer">
-  <iframe width="576" height="324" autoplay=false src="https://storage.googleapis.com/xovox/TRNC_F.mp4" frameborder="0" allowfullscreen></iframe> 
+  <video width="576" height="324" controls preload="none" playsinline data-src="https://storage.googleapis.com/xovox/TRNC_F.mp4"></video> 
 </div>
 <p></p>
 
@@ -278,7 +278,7 @@ document.addEventListener("play", function(event) {
 <br></br>
 &nbsp; &nbsp; <button style="padding: 15px 30px; font-size: 18px;" onclick="toggleVideo('MV')">Open Oscilliscope viewer</button>
 &nbsp; &nbsp; <div id="MV" class="videoContainer">
-  <iframe width="576" height="324" autoplay=false src="https://storage.googleapis.com/xovox/Massive_F.mp4" frameborder="0" allowfullscreen></iframe> 
+  <video width="576" height="324" controls preload="none" playsinline data-src="https://storage.googleapis.com/xovox/Massive_F.mp4"></video> 
 </div>
 <p></p>
 
@@ -447,8 +447,40 @@ document.addEventListener("play", function(event) {
 <script>
 function toggleVideo(videoId) {
   var videoContainer = document.getElementById(videoId);
-  videoContainer.style.display = (videoContainer.style.display === "block") ? "none" : "block";
+  var video = videoContainer.querySelector("video");
+  var isOpen = videoContainer.style.display === "block";
+
+  if (isOpen) {
+    video.pause();
+    videoContainer.style.display = "none";
+  } else {
+    videoContainer.style.display = "block";
+
+    // Do not give the MP4 a source until the user explicitly opens the viewer.
+    // This prevents Facebook's in-app browser from auto-playing it on page load.
+    if (!video.src) {
+      video.autoplay = false;
+      video.src = video.dataset.src;
+      video.load();
+      video.pause();
+    }
+  }
 }
+
+// Extra safeguard for browsers/in-app browsers that restore media state.
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll("video").forEach(function(video) {
+    video.autoplay = false;
+    video.pause();
+  });
+});
+
+window.addEventListener("pageshow", function() {
+  document.querySelectorAll("video").forEach(function(video) {
+    video.autoplay = false;
+    video.pause();
+  });
+});
 </script>
 <script>
         function revealAndScroll() {
