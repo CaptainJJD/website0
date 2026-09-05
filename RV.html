@@ -17,17 +17,28 @@
       <script type="text/javascript" src="lightbox-plus-jquery.min.js">
                                                                  </script>
        
-        <script type="text/javascript" src="https://rawgit.com/mikeflynn/egg.js/9d4e0518cf9db87f634b36df5ad805ab957dcac3/egg.min.js"></script>
+        
 		
 		
              
              
-    <script type="text/javascript"> var egg = new Egg();
-    egg.addCode("e,g,g", function() {
-     alert("=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)");
+    <script type="text/javascript">
+(function () {
+    var typed = "";
+    document.addEventListener("keyup", function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey) {
+            typed = "";
+            return;
+        }
+        var key = event.key.toLowerCase();
+        typed = key.length === 1 ? (typed + key).slice(-3) : "";
+        if (typed === "egg") {
+            typed = "";
+            alert("=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)=^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^) =^)");
+        }
     });
-    egg.listen();
-             </script>
+})();
+</script>
                                                                </head>
      <!------------------------------------------------------------------------------------------------------------------------------->
       <!------------------------------------------------------------------------------------------------------------------------------->
@@ -176,7 +187,7 @@
 <p></p>
 <a href="photos/52WhiteSands/5.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/5.jpg" loading="lazy" width="200"></a>
 <a href="photos/52WhiteSands/6.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/6.jpg" loading="lazy" width="200"></a>
-<a href="photos/52WhiteSands/7.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/7.jpg" loading="lazy" width="200"></a>
+<a href="photos/52WhiteSands/7.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/7.gif" loading="lazy" width="200"></a>
 <a href="photos/52WhiteSands/8.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/8.jpg" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/52WhiteSands/9.jpg" data-lightbox="photos/52WhiteSands" data-title=""><img src="photos/52WhiteSands/small/9.jpg" loading="lazy" width="200"></a>
@@ -279,7 +290,7 @@
 <a href="photos/50BalloonFeista/20.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/20.jpg" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/50BalloonFeista/21.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/21.jpg" loading="lazy" width="200"></a>
-<a href="photos/50BalloonFeista/22.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/22.jpg" loading="lazy" width="200"></a>
+<a href="photos/50BalloonFeista/22.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/22.gif" loading="lazy" width="200"></a>
 <a href="photos/50BalloonFeista/23.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/23.jpg" loading="lazy" width="200"></a>
 <a href="photos/50BalloonFeista/24.jpg" data-lightbox="photos/50BalloonFeista" data-title=""><img src="photos/50BalloonFeista/small/24.jpg" loading="lazy" width="200"></a>
 <p></p>
@@ -329,7 +340,7 @@
 <a href="photos/49PikesPeak/15.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/15.jpg" loading="lazy" width="200"></a>
 <a href="photos/49PikesPeak/16.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/16.jpg" loading="lazy" width="200"></a>
 <p></p>
-<a href="photos/49PikesPeak/17.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/17.jpg" loading="lazy" width="200"></a>
+<a href="photos/49PikesPeak/17.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/17.gif" loading="lazy" width="200"></a>
 <a href="photos/49PikesPeak/18.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/18.jpg" loading="lazy" width="200"></a>
 <a href="photos/49PikesPeak/19.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/19.jpg" loading="lazy" width="200"></a>
 <a href="photos/49PikesPeak/20.jpg" data-lightbox="photos/49PikesPeak" data-title=""><img src="photos/49PikesPeak/small/20.jpg" loading="lazy" width="200"></a>
@@ -363,7 +374,7 @@
 <a href="photos/48GardenGods/17.jpg" data-lightbox="photos/48GardenGods" data-title=""><img src="photos/48GardenGods/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/48GardenGods/18.jpg" data-lightbox="photos/48GardenGods" data-title=""><img src="photos/48GardenGods/small/18.jpg" loading="lazy" width="200"></a>
 <a href="photos/48GardenGods/19.jpg" data-lightbox="photos/48GardenGods" data-title=""><img src="photos/48GardenGods/small/19.jpg" loading="lazy" width="200"></a>
-<a href="photos/48GardenGods/20.jpg" data-lightbox="photos/48GardenGods" data-title=""><img src="photos/48GardenGods/small/20.jpg" loading="lazy" width="200"></a>
+<a href="photos/48GardenGods/20.jpg" data-lightbox="photos/48GardenGods" data-title=""><img src="photos/48GardenGods/small/20.gif" loading="lazy" width="200"></a>
 <p></p><br>
 <p></p><br>
 
@@ -462,12 +473,12 @@
 <a href="photos/45SandDunes/17.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/45SandDunes/18.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/18.jpg" loading="lazy" width="200"></a>
 <a href="photos/45SandDunes/19.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/19.jpg" loading="lazy" width="200"></a>
-<a href="photos/45SandDunes/20.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/20.jpg" loading="lazy" width="200"></a>
+<a href="photos/45SandDunes/20.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/20.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/45SandDunes/21.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/21.jpg" loading="lazy" width="200"></a>
 <a href="photos/45SandDunes/22.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/22.jpg" loading="lazy" width="200"></a>
 <a href="photos/45SandDunes/23.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/23.jpg" loading="lazy" width="200"></a>
-<a href="photos/45SandDunes/24.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/24.jpg" loading="lazy" width="200"></a>
+<a href="photos/45SandDunes/24.jpg" data-lightbox="photos/45SandDunes" data-title=""><img src="photos/45SandDunes/small/24.gif" loading="lazy" width="200"></a>
 <p></p><br>
 <p></p><br>
 
@@ -505,7 +516,7 @@
 <a href="photos/44Albuquerque/21.jpg" data-lightbox="photos/44Albuquerque" data-title=""><img src="photos/44Albuquerque/small/21.jpg" loading="lazy" width="200"></a>
 <a href="photos/44Albuquerque/22.jpg" data-lightbox="photos/44Albuquerque" data-title=""><img src="photos/44Albuquerque/small/22.jpg" loading="lazy" width="200"></a>
 <a href="photos/44Albuquerque/23.jpg" data-lightbox="photos/44Albuquerque" data-title=""><img src="photos/44Albuquerque/small/23.jpg" loading="lazy" width="200"></a>
-<a href="photos/44Albuquerque/24.jpg" data-lightbox="photos/44Albuquerque" data-title=""><img src="photos/44Albuquerque/small/24.jpg" loading="lazy" width="200"></a>
+<a href="photos/44Albuquerque/24.jpg" data-lightbox="photos/44Albuquerque" data-title=""><img src="photos/44Albuquerque/small/24.gif" loading="lazy" width="200"></a>
 <p></p><br>
 <p></p><br>
 
@@ -656,7 +667,7 @@
 <a href="photos/39Hemet/8.jpg"  data-lightbox="photos/39Hemet"  data-title=""><img src="photos/39Hemet/small/8.jpg"  loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/39Hemet/9.jpg"  data-lightbox="photos/39Hemet"  data-title=""><img src="photos/39Hemet/small/9.jpg"  loading="lazy" width="200"></a>
-<a href="photos/39Hemet/10.jpg" data-lightbox="photos/39Hemet" data-title=""><img src="photos/39Hemet/small/10.jpg" loading="lazy" width="200"></a>
+<a href="photos/39Hemet/10.jpg" data-lightbox="photos/39Hemet" data-title=""><img src="photos/39Hemet/small/10.gif" loading="lazy" width="200"></a>
 <a href="photos/39Hemet/11.jpg" data-lightbox="photos/39Hemet" data-title=""><img src="photos/39Hemet/small/11.jpg" loading="lazy" width="200"></a>
 <a href="photos/39Hemet/12.jpg" data-lightbox="photos/39Hemet" data-title=""><img src="photos/39Hemet/small/12.jpg" loading="lazy" width="200"></a>
 <p></p><br>
@@ -795,7 +806,7 @@
 <p></p>
 <a href="photos/35RenoLakeTahoe/21.jpg" data-lightbox="photos/35RenoLakeTahoe" data-title=""><img src="photos/35RenoLakeTahoe/small/21.jpg" loading="lazy" width="200"></a>
 <a href="photos/35RenoLakeTahoe/22.jpg" data-lightbox="photos/35RenoLakeTahoe" data-title=""><img src="photos/35RenoLakeTahoe/small/22.jpg" loading="lazy" width="200"></a>
-<a href="photos/35RenoLakeTahoe/23.jpg" data-lightbox="photos/35RenoLakeTahoe" data-title=""><img src="photos/35RenoLakeTahoe/small/23.jpg" loading="lazy" width="200"></a>
+<a href="photos/35RenoLakeTahoe/23.jpg" data-lightbox="photos/35RenoLakeTahoe" data-title=""><img src="photos/35RenoLakeTahoe/small/23.gif" loading="lazy" width="200"></a>
 <a href="photos/35RenoLakeTahoe/24.jpg" data-lightbox="photos/35RenoLakeTahoe" data-title=""><img src="photos/35RenoLakeTahoe/small/24.jpg" loading="lazy" width="200"></a>
 		<p></p><br>
 <p></p><br>   
@@ -972,7 +983,7 @@
 <a href="photos/31Mojave/13.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/13.jpg" loading="lazy" width="200"></a>
 <a href="photos/31Mojave/14.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/14.jpg" loading="lazy" width="200"></a>
 <a href="photos/31Mojave/15.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/15.jpg" loading="lazy" width="200"></a>
-<a href="photos/31Mojave/16.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/16.jpg" loading="lazy" width="200"></a>
+<a href="photos/31Mojave/16.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/16.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/31Mojave/17.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/31Mojave/18.jpg" data-lightbox="photos/31Mojave" data-title=""><img src="photos/31Mojave/small/18.jpg" loading="lazy" width="200"></a>
@@ -988,7 +999,7 @@
 <a href="photos/30Sequoia/1.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/1.jpg" loading="lazy" width="200"></a>
 <a href="photos/30Sequoia/2.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/2.jpg" loading="lazy" width="200"></a>
 <a href="photos/30Sequoia/3.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/3.jpg" loading="lazy" width="200"></a>
-<a href="photos/30Sequoia/4.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/4.jpg" loading="lazy" width="200"></a>
+<a href="photos/30Sequoia/4.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/4.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/30Sequoia/5.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/5.jpg" loading="lazy" width="200"></a>
 <a href="photos/30Sequoia/6.jpg" data-lightbox="photos/30Sequoia" data-title=""><img src="photos/30Sequoia/small/6.jpg" loading="lazy" width="200"></a>
@@ -1078,7 +1089,7 @@
 <a href="photos/28JoshuaTree/17.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/28JoshuaTree/18.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/18.jpg" loading="lazy" width="200"></a>
 <a href="photos/28JoshuaTree/19.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/19.jpg" loading="lazy" width="200"></a>
-<a href="photos/28JoshuaTree/20.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/20.jpg" loading="lazy" width="200"></a>
+<a href="photos/28JoshuaTree/20.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/20.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/28JoshuaTree/21.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/21.jpg" loading="lazy" width="200"></a>
 <a href="photos/28JoshuaTree/22.jpg" data-lightbox="photos/28JoshuaTree" data-title=""><img src="photos/28JoshuaTree/small/22.jpg" loading="lazy" width="200"></a>
@@ -1133,7 +1144,7 @@
 <a href="photos/27Arizona/17.jpg" data-lightbox="photos/27Arizona" data-title=""><img src="photos/27Arizona/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/27Arizona/18.jpg" data-lightbox="photos/27Arizona" data-title=""><img src="photos/27Arizona/small/18.jpg" loading="lazy" width="200"></a>
 <a href="photos/27Arizona/19.jpg" data-lightbox="photos/27Arizona" data-title=""><img src="photos/27Arizona/small/19.jpg" loading="lazy" width="200"></a>
-<a href="photos/27Arizona/20.jpg" data-lightbox="photos/27Arizona" data-title=""><img src="photos/27Arizona/small/20.jpg" loading="lazy" width="200"></a>
+<a href="photos/27Arizona/20.jpg" data-lightbox="photos/27Arizona" data-title=""><img src="photos/27Arizona/small/20.gif" loading="lazy" width="200"></a>
 
   <p></p><br>
 <p></p><br>   
@@ -1153,9 +1164,9 @@
 <a href="photos/26SilverCity/7.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/7.jpg" loading="lazy" width="200"></a>
 <a href="photos/26SilverCity/8.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/8.jpg" loading="lazy" width="200"></a>
 <p></p>
-<a href="photos/26SilverCity/9.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/9.jpg" loading="lazy" width="200"></a>
+<a href="photos/26SilverCity/9.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/9.gif" loading="lazy" width="200"></a>
 <a href="photos/26SilverCity/10.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/10.jpg" loading="lazy" width="200"></a>
-<a href="photos/26SilverCity/11.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/11.jpg" loading="lazy" width="200"></a>
+<a href="photos/26SilverCity/11.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/11.gif" loading="lazy" width="200"></a>
 <a href="photos/26SilverCity/12.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/12.jpg" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/26SilverCity/13.jpg" data-lightbox="photos/26SilverCity" data-title=""><img src="photos/26SilverCity/small/13.jpg" loading="lazy" width="200"></a>
@@ -1220,7 +1231,7 @@
 <a href="photos/24BigBend/9.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/9.jpg" loading="lazy" width="200"></a>
 <a href="photos/24BigBend/10.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/10.jpg" loading="lazy" width="200"></a>
 <a href="photos/24BigBend/11.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/11.jpg" loading="lazy" width="200"></a>
-<a href="photos/24BigBend/12.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/12.jpg" loading="lazy" width="200"></a>
+<a href="photos/24BigBend/12.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/12.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/24BigBend/13.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/13.jpg" loading="lazy" width="200"></a>
 <a href="photos/24BigBend/14.jpg" data-lightbox="photos/24BigBend" data-title=""><img src="photos/24BigBend/small/14.jpg" loading="lazy" width="200"></a>
@@ -1276,7 +1287,7 @@
        <<img src="photos/22zAmistad/zamistad.gif" loading="lazy" width="480" height="80">
 <br>
 <a href="photos/22zAmistad/1.jpg" data-lightbox="photos/22zAmistad" data-title=""><img src="photos/22zAmistad/small/1.jpg" loading="lazy" width="200"></a>
-<a href="photos/22zAmistad/2.jpg" data-lightbox="photos/22zAmistad" data-title=""><img src="photos/22zAmistad/small/2.jpg" loading="lazy" width="200"></a>
+<a href="photos/22zAmistad/2.jpg" data-lightbox="photos/22zAmistad" data-title=""><img src="photos/22zAmistad/small/2.gif" loading="lazy" width="200"></a>
 <a href="photos/22zAmistad/3.jpg" data-lightbox="photos/22zAmistad" data-title=""><img src="photos/22zAmistad/small/3.jpg" loading="lazy" width="200"></a>
 <a href="photos/22zAmistad/4.jpg" data-lightbox="photos/22zAmistad" data-title=""><img src="photos/22zAmistad/small/4.jpg" loading="lazy" width="200"></a>
 <p></p>
@@ -1361,7 +1372,7 @@
 <a href="photos/20Eastpoint/12.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/12.jpg" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/20Eastpoint/13.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/13.jpg" loading="lazy" width="200"></a>
-<a href="photos/20Eastpoint/14.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/14.jpg" loading="lazy" width="200"></a>
+<a href="photos/20Eastpoint/14.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/14.gif" loading="lazy" width="200"></a>
 <a href="photos/20Eastpoint/15.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/15.jpg" loading="lazy" width="200"></a>
 <a href="photos/20Eastpoint/16.jpg" data-lightbox="photos/20Eastpoint" data-title=""><img src="photos/20Eastpoint/small/16.jpg" loading="lazy" width="200"></a>
 <p></p>
@@ -1511,7 +1522,7 @@
 <a href="photos/15Keys/13.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/13.jpg" loading="lazy" width="200"></a>
 <a href="photos/15Keys/14.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/14.jpg" loading="lazy" width="200"></a>
 <a href="photos/15Keys/15.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/15.jpg" loading="lazy" width="200"></a>
-<a href="photos/15Keys/16.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/16.jpg" loading="lazy" width="200"></a>
+<a href="photos/15Keys/16.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/16.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/15Keys/17.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/17.jpg" loading="lazy" width="200"></a>
 <a href="photos/15Keys/18.jpg" data-lightbox="photos/15Keys"><img src="photos/15Keys/small/18.jpg" loading="lazy" width="200"></a>
@@ -1541,7 +1552,7 @@
 <a href="photos/14JDFM/9.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/9.jpg" loading="lazy" width="200"></a>
 <a href="photos/14JDFM/10.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/10.jpg" loading="lazy" width="200"></a>
 <a href="photos/14JDFM/11.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/11.jpg" loading="lazy" width="200"></a>
-<a href="photos/14JDFM/12.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/12.jpg" loading="lazy" width="200"></a>
+<a href="photos/14JDFM/12.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/12.gif" loading="lazy" width="200"></a>
 <p></p>
 <a href="photos/14JDFM/13.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/13.jpg" loading="lazy" width="200"></a>
 <a href="photos/14JDFM/14.jpg" data-lightbox="photos/14JDFM"><img src="photos/14JDFM/small/14.jpg" loading="lazy" width="200"></a>
