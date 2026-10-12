@@ -42,7 +42,32 @@
                                                                </head>
      <!------------------------------------------------------------------------------------------------------------------------------->
       <!------------------------------------------------------------------------------------------------------------------------------->
-       
+<script>
+const observer = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+
+      if (!img.complete) {
+        img.loading = "eager";
+        img.fetchPriority = "high";
+      }
+
+      observer.unobserve(img);
+    }
+  }
+}, {
+  rootMargin: "0px",
+  threshold: 0
+});
+
+document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+  observer.observe(img);
+});
+</script>
+
+</body>
+</html>
        
 <body>
 <center>                                                                        
